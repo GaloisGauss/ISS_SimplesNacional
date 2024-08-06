@@ -28,7 +28,9 @@ Este projeto oferece uma calculadora para determinar a alíquota efetiva do ISS 
 
 ## Teoria Matemática
 
-Para detalhes sobre a matemática por trás da calculadora, consulte a pasta `teoria/`.
+Para detalhes sobre a matemática por trás da calculadora, consulte a pasta `teoria/`. 
+![Alt Text](teoria/Figure_1.png)
+
 
 ## Contribuição
 
