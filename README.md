@@ -28,11 +28,11 @@ Este projeto oferece uma calculadora para determinar a alíquota efetiva do ISS 
 
 ## Teoria Matemática
 
-Para detalhes sobre a matemática por trás da calculadora, consulte a pasta `teoria/`. 
-(teoria/Figure_1.png)
-![Alt Text](teoria/Figure_2.png)
-![Alt Text](teoria/Figure_3.png)
+Para detalhes sobre a matemática por trás da calculadora, consulte a pasta `teoria/`.
 
+<img src="teoria/Figure_1.png" alt="Figura 1" width="300"/>
+<img src="teoria/Figure_2.png" alt="Figura 2" width="300"/>
+<img src="teoria/Figure_3.png" alt="Figura 3" width="300"/>
 
 ## Contribuição
 
@@ -41,3 +41,4 @@ Sinta-se à vontade para contribuir com melhorias ou correções. Abra uma issue
 ## Licença
 
 Este projeto é licenciado sob a [MIT License](LICENSE).
+
