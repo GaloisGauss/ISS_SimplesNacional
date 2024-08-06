@@ -6,7 +6,7 @@ Este projeto oferece uma calculadora para determinar a alíquota efetiva do ISS 
 
 ## Estrutura do Repositório
 
-- `teoria/`: Contém documentos detalhando a teoria matemática e a legislação.
+- `teoria/`: Contém documentos detalhando as fórmulas matemática e a legislação.
 - `codigo_python/`: Contém o script Python para a calculadora.
 - `codigo_vba/`: Contém o script VBA para a calculadora no Excel.
 - `exemplos/`: Contém exemplos de uso dos scripts.
@@ -28,7 +28,7 @@ Este projeto oferece uma calculadora para determinar a alíquota efetiva do ISS 
 
 ## Teoria Matemática
 
-Para detalhes sobre a teoria matemática por trás da calculadora, consulte a pasta `teoria/`.
+Para detalhes sobre a matemática por trás da calculadora, consulte a pasta `teoria/`.
 
 ## Contribuição
 
