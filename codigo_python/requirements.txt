@@ -1,0 +1,23 @@
+
+Exemplo de `requirements.txt`:
+
+#### 4. Código VBA
+Uma pasta `codigo_vba` contendo o script VBA para a implementação no Excel:
+
+- `calculator.vba`: O script VBA.
+- `README.md`: Instruções específicas de como usar o script VBA no Excel.
+
+Exemplo de `README.md` dentro da pasta `codigo_vba`:
+```markdown
+# Calculadora de Alíquota do ISS - VBA
+
+## Instruções de Uso
+
+1. Abra o Excel e acesse o Editor do VBA (Alt + F11).
+2. Importe o script `calculator.vba`.
+3. Adicione os dados na planilha conforme o exemplo.
+4. Execute a macro `CalcularAliquota`.
+
+## Estrutura do Código
+
+- `calculator.vba`: Contém a lógica para calcular a alíquota do ISS no Excel.
