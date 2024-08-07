@@ -26,7 +26,7 @@ Este projeto oferece uma calculadora para determinar a alíquota efetiva do ISS 
 2. Importe o script VBA no Editor do VBA.
 3. Siga as instruções no arquivo de exemplo para usar a calculadora.
 
-## Teoria Matemática
+## Matemática
 
 Para detalhes sobre a matemática por trás da calculadora, consulte a pasta `teoria/`.
 
