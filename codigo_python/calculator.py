@@ -6,7 +6,9 @@ def calcular_aliquota():
     try:
         receita_bruta = float(entry_receita_bruta.get().replace(',', '.'))
         meses_atividade = int(entry_meses_atividade.get())
-        receita_bruta_proporcional = calcular_receita_proporcional(receita_bruta, meses_atividade)
+        if meses_atividade < 1 or meses_atividade > 12:
+            messagebox.showerror("Erro", "Meses de atividade deve estar entre 1 e 12.")
+            return
 
         aplica_fator_r = var_fator_r.get()
         fator_r = 0
@@ -24,89 +26,96 @@ def calcular_aliquota():
             messagebox.showerror("Erro", "Por favor, selecione um anexo.")
             return
 
-        aliquota_iss = calcular_aliquota_efetiva(receita_bruta_proporcional, anexo)
-        result.set(f'Alíquota ISS: {aliquota_iss:.2f}%')
+        aliquota_efetiva, percentual_iss, aliquota_iss = calcular_aliquota_efetiva(receita_bruta, anexo, meses_atividade)
+        result.set(f'Alíquota Efetiva Total: {aliquota_efetiva*100:.2f}%\n'
+                   f'Percentual de Repartição do ISS: {percentual_iss*100:.2f}%\n'
+                   f'Alíquota Efetiva do ISS: {aliquota_iss*100:.2f}%')
     except ValueError:
         messagebox.showerror("Erro", "Por favor, insira valores válidos.")
 
-def calcular_receita_proporcional(receita_bruta, meses_atividade):
-    if meses_atividade < 1 or meses_atividade > 12:
-        raise ValueError("Meses de atividade deve estar entre 1 e 12.")
-    receita_bruta_proporcional = (receita_bruta / meses_atividade) * 12
-    return receita_bruta_proporcional
-
-def calcular_aliquota_efetiva(receita_bruta, anexo):
+def calcular_aliquota_efetiva(receita_bruta, anexo, meses_atividade):
     if anexo == 'Anexo III':
-        return calcular_aliquota_anexo_iii(receita_bruta)
+        return calcular_aliquota_anexo_iii(receita_bruta, meses_atividade)
     elif anexo == 'Anexo IV':
-        return calcular_aliquota_anexo_iv(receita_bruta)
+        return calcular_aliquota_anexo_iv(receita_bruta, meses_atividade)
     elif anexo == 'Anexo V':
-        return calcular_aliquota_anexo_v(receita_bruta)
+        return calcular_aliquota_anexo_v(receita_bruta, meses_atividade)
     else:
-        return 0
+        return 0, 0, 0
 
-def calcular_aliquota_anexo_iii(receita_bruta):
+def ajustar_faixas(faixas, meses_atividade):
+    fator = meses_atividade / 12.0
+    faixas_ajustadas = []
+    for faixa in faixas:
+        faixa_final = faixa[0] * fator
+        faixas_ajustadas.append((faixa_final,) + faixa[1:])
+    return faixas_ajustadas
+
+def calcular_aliquota_anexo_iii(receita_bruta, meses_atividade):
     faixas = [
         (180000.00, 0.06, 0.00, 0.3350),
         (360000.00, 0.112, 9360.00, 0.3200),
         (720000.00, 0.135, 17640.00, 0.3250),
         (1800000.00, 0.16, 35640.00, 0.3250),
         (3600000.00, 0.21, 125640.00, 0.3350),
-        (4800000.00, 0.33, 648000.00, 0.0000)
+        (4800000.00, 0.33, 648000.00, 0.00)
     ]
-    for faixa in faixas:
+    faixas_ajustadas = ajustar_faixas(faixas, meses_atividade)
+    for faixa in faixas_ajustadas:
         if receita_bruta <= faixa[0]:
             aliquota_nominal = faixa[1]
             parcela_deduzir = faixa[2]
             percentual_iss = faixa[3]
-            aliquota_efetiva = ((receita_bruta * aliquota_nominal) - parcela_deduzir) / receita_bruta
+            aliquota_efetiva = (receita_bruta * aliquota_nominal - parcela_deduzir) / receita_bruta
             aliquota_iss = aliquota_efetiva * percentual_iss
             # Aplicar o limite máximo de 5% ao ISS
             if aliquota_iss > 0.05:
                 aliquota_iss = 0.05
-            return aliquota_iss * 100  # Converter para porcentagem
+            return aliquota_efetiva, percentual_iss, aliquota_iss
+    return 0, 0, 0
 
-def calcular_aliquota_anexo_iv(receita_bruta):
+def calcular_aliquota_anexo_iv(receita_bruta, meses_atividade):
     faixas = [
-        (180000.00, 0.045, 0.00, 0.4450),
-        (360000.00, 0.09, 8100.00, 0.4000),
-        (720000.00, 0.102, 12420.00, 0.4000),
-        (1800000.00, 0.14, 39780.00, 0.4000),
-        (3600000.00, 0.22, 183780.00, 0.4000),
-        (4800000.00, 0.33, 828000.00, 0.0000)
+        (180000.00, 0.045, 0.00, 0.0),  # No Anexo IV, o ISS é recolhido fora do Simples
+        (360000.00, 0.09, 8100.00, 0.0),
+        (720000.00, 0.102, 12420.00, 0.0),
+        (1800000.00, 0.14, 39780.00, 0.0),
+        (3600000.00, 0.22, 183780.00, 0.0),
+        (4800000.00, 0.33, 828000.00, 0.0)
     ]
-    for faixa in faixas:
+    faixas_ajustadas = ajustar_faixas(faixas, meses_atividade)
+    for faixa in faixas_ajustadas:
         if receita_bruta <= faixa[0]:
             aliquota_nominal = faixa[1]
             parcela_deduzir = faixa[2]
-            percentual_iss = faixa[3]
-            aliquota_efetiva = ((receita_bruta * aliquota_nominal) - parcela_deduzir) / receita_bruta
-            aliquota_iss = aliquota_efetiva * percentual_iss
-            # Aplicar o limite máximo de 5% ao ISS
-            if aliquota_iss > 0.05:
-                aliquota_iss = 0.05
-            return aliquota_iss * 100  # Converter para porcentagem
+            percentual_iss = faixa[3]  # Será 0 no Anexo IV
+            aliquota_efetiva = (receita_bruta * aliquota_nominal - parcela_deduzir) / receita_bruta
+            aliquota_iss = 0  # ISS recolhido fora do Simples no Anexo IV
+            return aliquota_efetiva, percentual_iss, aliquota_iss
+    return 0, 0, 0
 
-def calcular_aliquota_anexo_v(receita_bruta):
+def calcular_aliquota_anexo_v(receita_bruta, meses_atividade):
     faixas = [
-        (180000.00, 0.155, 0.00, 0.14),
-        (360000.00, 0.18, 4500.00, 0.17),
-        (720000.00, 0.195, 9900.00, 0.19),
-        (1800000.00, 0.205, 17100.00, 0.21),
-        (3600000.00, 0.23, 62100.00, 0.2350),
-        (4800000.00, 0.305, 540000.00, 0.0000)
+        (180000.00, 0.155, 0.00, 0.28),
+        (360000.00, 0.18, 4500.00, 0.335),
+        (720000.00, 0.195, 9900.00, 0.35),
+        (1800000.00, 0.205, 17100.00, 0.355),
+        (3600000.00, 0.23, 62100.00, 0.365),
+        (4800000.00, 0.305, 540000.00, 0.00)
     ]
-    for faixa in faixas:
+    faixas_ajustadas = ajustar_faixas(faixas, meses_atividade)
+    for faixa in faixas_ajustadas:
         if receita_bruta <= faixa[0]:
             aliquota_nominal = faixa[1]
             parcela_deduzir = faixa[2]
             percentual_iss = faixa[3]
-            aliquota_efetiva = ((receita_bruta * aliquota_nominal) - parcela_deduzir) / receita_bruta
+            aliquota_efetiva = (receita_bruta * aliquota_nominal - parcela_deduzir) / receita_bruta
             aliquota_iss = aliquota_efetiva * percentual_iss
             # Aplicar o limite máximo de 5% ao ISS
             if aliquota_iss > 0.05:
                 aliquota_iss = 0.05
-            return aliquota_iss * 100  # Converter para porcentagem
+            return aliquota_efetiva, percentual_iss, aliquota_iss
+    return 0, 0, 0
 
 def limpar_dados():
     entry_receita_bruta.delete(0, tk.END)
@@ -158,7 +167,7 @@ btn_limpar.grid(row=4, column=1, padx=10, pady=20)
 # Resultado
 result = tk.StringVar()
 result.set('')
-lbl_result = tk.Label(frame, textvariable=result, font=("Arial", 24), bg='black', fg='white')
+lbl_result = tk.Label(frame, textvariable=result, font=("Arial", 14), bg='black', fg='white')
 lbl_result.grid(row=5, columnspan=2, pady=20)
 
 root.mainloop()
